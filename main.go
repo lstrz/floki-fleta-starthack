@@ -233,9 +233,9 @@ func main() {
 	GameKernel.AddEventHandler(ew)
 
 	e := echo.New()
-	web := NewWebServer(e, "./webfiles")
+	web := NewWebServer(e, "./frontend")
 	e.Renderer = web
-	web.SetupStatic(e, "/public", "./webfiles/public")
+	web.SetupStatic(e, "/public", "./frontend/public")
 	webChecker := func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
 			web.CheckWatch()
