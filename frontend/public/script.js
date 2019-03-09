@@ -1,29 +1,49 @@
-var canvasW = 128;
-var canvasH = 128;
+var canvasW = 1024;
+var canvasH = 1024;
 var canvasPadding = 50;
-var board = new Array(canvasW * canvasH).fill(0);
+var colors = new Array(canvasW * canvasH).fill(0);
+var prices = new Array(canvasW * canvasH).fill(0);
+var times = new Array(canvasW * canvasH).fill(0);
+var canvas;
+var ctx;
 
 function initialize() {
-    var canvas = document.getElementById('flace-canvas');
-    var ctx = canvas.getContext('2d');
+    canvas = document.getElementById('flace-canvas');
+    ctx = canvas.getContext('2d');
 
+    $.get("/api/board", function (resp) {
+        var board = resp.board;
+        canvasW = board.Width;
+        canvasH = board.Height;
+        for (i = 0; i < canvasW; ++i) {
+            for (j = 0; j < canvasH; ++j) {
+                var off = j * canvasW + i;
+                colors[off] = "#" + board.Cells[off].Color.toString(16).padStart(6, "0");
+                prices[off] = board.Cells[off].Price;
+                times[off] = board.Cells[off].CreationTime;
+            }
+        }
+        initializeCont();
+    });
+}
+
+function initializeCont() {
     ctx.canvas.width = canvasW;
     ctx.canvas.height = canvasH;
 
-    ctx.fillStyle = 'rgb(0, 0, 0)';
     ctx.imageSmoothingEnabled = false;
     for (i = 0; i < canvasW; ++i) {
         for (j = 0; j < canvasH; ++j) {
-            ctx.fillRect(i, j, 1, 1);
+            var off = j * canvasW + i;
+            setPixel(i, j, colors[off]);
         }
     }
-
     // var ws = new WebSocket("ws://localhost:31337");
     // window.ws = null;
     // ws.onopen = function () {
     //     window.ws = ws;
     // };
-    //
+
     // ws.onmessage = function (evt) {
     //     var msg = JSON.parse(evt.data);
     //     setPixel(msg.x, msg.y, msg.color);
@@ -45,18 +65,18 @@ function initialize() {
     var color = document.getElementById('color');
     var price = document.getElementById('price');
 
-    window.canvas = canvas;
-    window.ctx = ctx;
     window.color = color;
     window.price = price;
     window.scaleFactor = 1;
+
+    resizeCanvas();
 }
 
 function hoverPrice(canvas, event) {
     var rect = canvas.getBoundingClientRect();
     var x = Math.floor((event.clientX - rect.left) / window.scaleFactor);
     var y = Math.floor((event.clientY - rect.top) / window.scaleFactor);
-    document.getElementById('current_price').innerHTML = board[y * canvasW + x];
+    document.getElementById('current_price').innerHTML = prices[y * canvasW + x];
 }
 
 function sendRequest(canvas, event) {
@@ -71,33 +91,32 @@ function sendRequest(canvas, event) {
     var rect = canvas.getBoundingClientRect();
     var x = Math.floor((event.clientX - rect.left) / window.scaleFactor);
     var y = Math.floor((event.clientY - rect.top) / window.scaleFactor);
-    // if (window.ws != null) {
-    //     window.ws.send(JSON.stringify({"x": x, "y": y, "color": window.color.value, "price": window.price.value}));
-    // }
 
-    $.post("/api/games/" + window.address + "/commands/add_count", {
+    $.post("/api/games/" + window.address + "/commands/paint", JSON.stringify({
+        "utxo": utxo,
         "x": x,
         "y": y,
-        "color": window.color.value,
-        "price": window.price.value
-    }, function () {
-        this.result1 = JSON.stringify(res.body);
+        "color": parseInt(window.color.value.substring(1), 16),
+        "amount": parseInt(window.price.value)
+    }), function (resp) {
+        $("#paint-result1").html(JSON.stringify(resp));
 
-        var data = res.body;
-        var msg = new Buffer(data.hash_hex, "hex");
+        var msg = new Buffer(resp.hash_hex, "hex");
         var sig = window.key.sign(msg);
         var SIG_HEX = buf2hex(sig.r.toArrayLike(Buffer, "be", 32)) + buf2hex(sig.s.toArrayLike(Buffer, "be", 32)) + "0" + sig.recoveryParam;
 
-        $.post("/api/games/" + window.address + "/commands/commit", {
-            "type": data.type,
-            "tx_hex": data.tx_hex,
+        $.post("/api/games/" + window.address + "/commands/commit", JSON.stringify({
+            "type": resp.type,
+            "tx_hex": resp.tx_hex,
             "sig_hex": SIG_HEX
-        }, function (res) {
-            this.result2 = JSON.stringify(res.body);
+        }), function (resp) {
+            $("#paint-result2").html(JSON.stringify(resp));
+        }).error(function (resp) {
+            $("#paint-result2").html(JSON.stringify(resp));
         });
+    }).error(function (resp) {
+        $("#paint-result1").html(JSON.stringify(resp));
     });
-
-    console.log("x: " + x + " y: " + y);
 }
 
 
@@ -111,17 +130,16 @@ function resizeCanvas() {
     var scaleY = (window.innerHeight - canvasPadding) / window.canvas.height;
 
     var scaleToFit = Math.min(scaleX, scaleY) * window.scaleFactor;
-    console.log("Scale to fit: " + scaleToFit);
 
     window.scaleFactor = scaleToFit;
     window.canvas.width = canvasW * scaleToFit;
     window.canvas.height = canvasH * scaleToFit;
     window.ctx.scale(scaleToFit, scaleToFit);
 
-    window.ctx.fillStyle = 'rgb(0, 0, 0)';
     for (i = 0; i < canvasW; ++i) {
         for (j = 0; j < canvasH; ++j) {
-            ctx.fillRect(i, j, 1, 1);
+            var off = j * canvasW + i;
+            setPixel(i, j, colors[off]);
         }
     }
 }
