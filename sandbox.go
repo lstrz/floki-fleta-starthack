@@ -32,6 +32,14 @@ type WebAddCountReq struct {
 	Count int    `json:"count"`
 }
 
+type WebPaintReq struct {
+	UTXO uint64   `json:"utxo"`
+	X uint64      `json:"x"`
+	Y uint64      `json:"y"`
+	Color uint64  `json:"color"`
+	Amount uint64 `json:"amount"`
+}
+
 type WebNotify struct {
 	Height int    `json:"height"` // DO NOT CHANGE
 	Type   string `json:"type"`   // DO NOT CHANGE
@@ -52,11 +60,13 @@ const (
 	// In sandbox, Transaction fee is not calculated
 	// Game Transactions
 	AddCountTransactionType = transaction.Type(11)
+	PaintTransactionType = transaction.Type(12)
 )
 
 func initSandboxComponent(act *data.Accounter, tran *data.Transactor) error {
 	TxFeeTable := map[string]*txFee{
 		"sandbox.AddCount": &txFee{AddCountTransactionType, amount.COIN.MulC(10)},
+		"sandbox.Paint": &txFee{PaintTransactionType, amount.COIN.MulC(10)},
 		// ADD YOUR OWN TRANSACTION TO HERE
 	}
 	for name, item := range TxFeeTable {

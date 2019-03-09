@@ -341,6 +341,110 @@
 	</script>
 </tx-form>
 
+<paint-form>
+	<div id="tx-paint">
+		<div>
+			You can send paint transaction using this form<br/>
+			You should login before to send
+		</div>
+		<div>
+			X: <input type="number" v-model="x" name="x" placeholder="x" />
+			Y: <input type="number" v-model="y" name="y" placeholder="y" />
+			Color: <input type="color" v-model="color" name="color" />
+			Amount: <input type="number" v-model="amount" name="payment" />
+		</div>
+		<div>
+			Result 1 (tx)
+			<pre v-html="result1">
+			</pre>
+		</div>
+		<div>
+			Result 2 (commit)
+			<pre v-html="result2">
+			</pre>
+		</div>
+		<button type="button" class="btn-send" v-on:click="do_send">Send</button>
+	</div>
+	<script type="vue">
+	data: function() {
+		var obj = {
+			x: 0,
+			y: 0,
+			color: 0,
+			amount: 0,
+			result1: "",
+			result2: ""
+		};
+		return obj;
+	},
+	methods: {
+		do_send: function() {
+			if(window.address == null) {
+				alert("Please login first");
+				return;
+			}
+			/*
+			if(this.count.length == 0) {
+				alert("Please enter count");
+				return;
+			}
+			var count = parseInt(this.count);
+			if(isNaN(count)) {
+				alert("Please enter valid count");
+				return;
+			}
+			*/
+
+			var utxo = window.utxos[0];
+			window.utxos.splice(0, 1);
+			
+			function HEXToVBColor(rrggbb) {
+    			var bbggrr = rrggbb.substr(4, 2) + rrggbb.substr(2, 2) + rrggbb.substr(0, 2);
+ 			   return parseInt(bbggrr, 16);
+			}
+
+			this.$http.post("/api/games/"  + window.address + "/commands/paint", {
+				utxo: utxo,
+				x: this.x,
+				y: this.y,
+				color: HEXToVBColor(this.color.substring(1)),
+				amount: this.amount
+			}).then(function(res) {
+				this.result1 = JSON.stringify(res.body);
+
+				var data = res.body;
+				var msg = new Buffer(data.hash_hex, "hex");
+				var sig = window.key.sign(msg);
+				var SIG_HEX = buf2hex(sig.r.toArrayLike(Buffer, "be", 32)) + buf2hex(sig.s.toArrayLike(Buffer, "be", 32)) + "0" + sig.recoveryParam;
+
+				this.$http.post("/api/games/"  + window.address + "/commands/commit", {
+					"type": data.type,
+					"tx_hex": data.tx_hex,
+					"sig_hex": SIG_HEX
+				}).then(function(res) {
+					this.result2 = JSON.stringify(res.body);
+				}, function(err) {
+					this.result2 = err;
+				});
+			}, function(err) {
+				this.result1 = err;
+			});
+		},
+		getKeyPair: function(userid, userpw) {
+			userid = SHA2(userid);
+			userpw = SHA2(userpw);
+			var salt = SHA2("this is fleta sandbox");
+			var keyHex = SHA2(userid+"#"+userpw+"#"+salt);
+			var key = ec.keyPair({
+				priv: keyHex,
+				privEnc: "hex",
+			});
+			return key
+		}
+	}
+	</script>
+</paint-form>
+
 <hr/>
 
 <% template "_bottom.html" . %>

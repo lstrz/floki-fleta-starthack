@@ -502,6 +502,78 @@ func main() {
 
 		return c.JSON(http.StatusOK, res)
 	})
+	gAPI.POST("/games/:address/commands/paint", func(c echo.Context) error {
+		addrStr := c.Param("address")
+		addr, err := common.ParseAddress(addrStr)
+		if err != nil {
+			return err
+		}
+
+		body, err := ioutil.ReadAll(c.Request().Body)
+		if err != nil {
+			return err
+		}
+		defer c.Request().Body.Close()
+
+		var req WebPaintReq
+		if err := json.Unmarshal(body, &req); err != nil {
+			return err
+		}
+		if req.UTXO == 0 {
+			return ErrInvalidUTXO
+		}
+
+		//////////////////////////////////////////////////////////////////////
+		// Sandbox Area Begin
+		//////////////////////////////////////////////////////////////////////
+
+		if req.X < 0 || req.Y < 0 {
+			return ErrInvalidCount
+		}
+
+		//////////////////////////////////////////////////////////////////////
+		// Sandbox Area End
+		//////////////////////////////////////////////////////////////////////
+
+		loader := GameKernel.Loader()
+		if is, err := loader.IsExistAccount(addr); err != nil {
+			return err
+		} else if !is {
+			return ErrNotExistAccount
+		}
+
+		//////////////////////////////////////////////////////////////////////
+		// Sandbox Area Begin
+		//////////////////////////////////////////////////////////////////////
+
+		t, err := loader.Transactor().NewByType(PaintTransactionType)
+		if err != nil {
+			return err
+		}
+
+		tx := t.(*PaintTx)
+		tx.Timestamp_ = uint64(time.Now().UnixNano())
+		tx.Vin = []*transaction.TxIn{transaction.NewTxIn(req.UTXO)}
+		tx.Address = addr
+		tx.Color = req.Color
+		tx.X = req.X
+		tx.Y = req.Y
+		tx.Payment = req.Amount
+
+		//////////////////////////////////////////////////////////////////////
+		// Sandbox Area End
+		//////////////////////////////////////////////////////////////////////
+
+		var buffer bytes.Buffer
+		if _, err := tx.WriteTo(&buffer); err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, &WebTxRes{
+			Type:    int(tx.Type()),
+			TxHex:   hex.EncodeToString(buffer.Bytes()),
+			HashHex: tx.Hash().String(),
+		})
+	})
 	gAPI.POST("/games/:address/commands/add_count", func(c echo.Context) error {
 		addrStr := c.Param("address")
 		addr, err := common.ParseAddress(addrStr)
