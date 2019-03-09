@@ -350,6 +350,9 @@ func main() {
 			return ErrNotExistAccount
 		}
 	})
+	gAPI.GET("/board", func(c echo.Context) error {
+		return c.Redirect(302, "/api/games/" + globalAccountAddress.String())
+	})
 	gAPI.POST("/accounts", func(c echo.Context) error {
 		body, err := ioutil.ReadAll(c.Request().Body)
 		if err != nil {
