@@ -105,10 +105,20 @@ func addSingleAccount(loader data.Loader, ctd *data.ContextData, KeyHash common.
 	acc.KeyHash = KeyHash
 	ctd.CreatedAccountMap[acc.Address_] = acc
 
+	const width = 64
+	const height = 64
+	const elements = width * height
+
+	cells := make([]PictureCell, elements)
+
+	for i := range cells{
+		cells[i] = PictureCell{uint64(i), 0, 0}
+	}
+
 	gd := NewGameDataWithBoard(PictureBoard{
 		Width: 64,
 		Height: 64,
-		Cells: []PictureCell{},
+		Cells: cells,
 	})
 
 	var buffer bytes.Buffer
