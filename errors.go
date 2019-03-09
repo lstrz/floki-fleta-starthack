@@ -21,4 +21,7 @@ var (
 	ErrExistKeyHash                = errors.New("exist key hash")
 	ErrExistUserID                 = errors.New("exist userid")
 	ErrQueueFull                   = errors.New("queue full")
+
+	ErrNotEnoughCoin               = errors.New("not enough coin to set")
+	ErrNotInBounds                 = errors.New("coordinates out of bounds")
 )
