@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"strconv"
 
@@ -78,6 +79,7 @@ func initGenesisContextData(act *data.Accounter, tran *data.Transactor) (*data.C
 	adminPubHash := common.MustParsePublicHash("3oawb1ubDv3tSJdhXDYiM53G58gJPTynVJwDWtbQYy2")
 	addUTXO(loader, ctd, adminPubHash, acg.Generate(), CreateAccountChannelSize)
 	addFormulator(loader, ctd, common.MustParsePublicHash("2NDLwtFxtrtUzy6Dga8mpzJDS5kapdWBKyptMhehNVB"), common.MustParseAddress("3CUsUpvEK"), "sandbox.fr00001")
+	addSingleAccount(loader, ctd, common.MustParsePublicHash("2222222222222222222222222222222222222222222"), common.MustParseAddress("3HPiADDVt3"), "gamestate")
 	RegisterAllowedPublicHash(adminPubHash)
 	return ctd, nil
 }
@@ -89,6 +91,27 @@ func addUTXO(loader data.Loader, ctd *data.ContextData, KeyHash common.PublicHas
 		ctd.CreateUTXO(id, &transaction.TxOut{Amount: amount.NewCoinAmount(0, 0), PublicHash: KeyHash})
 		ctd.SetAccountData(rootAddress, []byte("utxo"+strconv.Itoa(i)), util.Uint64ToBytes(id))
 	}
+}
+
+func addSingleAccount(loader data.Loader, ctd *data.ContextData, KeyHash common.PublicHash, addr common.Address, name string) {
+	a, err := loader.Accounter().NewByTypeName("sandbox.Account")
+	if err != nil {
+		panic(err)
+	}
+	acc := a.(*Account)
+	acc.Address_ = addr
+	acc.Name_ = name
+	acc.Balance_ = amount.NewCoinAmount(10000000000, 0)
+	acc.KeyHash = KeyHash
+	ctd.CreatedAccountMap[acc.Address_] = acc
+
+	gd := NewGameData()
+	var buffer bytes.Buffer
+	if _, err := gd.WriteTo(&buffer); err != nil {
+		panic(err)
+	}
+
+	ctd.SetAccountData(addr, []byte("game"), buffer.Bytes())
 }
 
 func addFormulator(loader data.Loader, ctd *data.ContextData, KeyHash common.PublicHash, addr common.Address, name string) {
