@@ -18,16 +18,16 @@ function initialize() {
         }
     }
 
-    var ws = new WebSocket("ws://localhost:31337");
-    window.ws = null;
-    ws.onopen = function () {
-        window.ws = ws;
-    };
-
-    ws.onmessage = function (evt) {
-        var msg = JSON.parse(evt.data);
-        setPixel(msg.x, msg.y, msg.color);
-    };
+    // var ws = new WebSocket("ws://localhost:31337");
+    // window.ws = null;
+    // ws.onopen = function () {
+    //     window.ws = ws;
+    // };
+    //
+    // ws.onmessage = function (evt) {
+    //     var msg = JSON.parse(evt.data);
+    //     setPixel(msg.x, msg.y, msg.color);
+    // };
 
     // ws.onclose = function() {
     //
@@ -142,13 +142,13 @@ function register() {
     var key = this.getKeyPair(userId, password);
     var pk = key.getPublic().encodeCompressed("hex");
 
-    $.post("http://172.17.0.2:8080/api/accounts", JSON.stringify({
+    $.post("/api/accounts", JSON.stringify({
         "public_key": pk,
         "user_id": userId,
     }), function (data) {
-        $(".register-result").html(JSON.stringify(data));
+        $("#register-result").html(JSON.stringify(data));
     }).error(function (data) {
-        $(".register-result").html(JSON.stringify(data));
+        $("#register-result").html(JSON.stringify(data));
     });
 }
 
@@ -180,16 +180,16 @@ function login() {
     var key = this.getKeyPair(userId, password);
     var pk = key.getPublic().encodeCompressed("hex");
 
-    $.get("http://172.17.0.2:8080/api/accounts?pubkey=" + pk, function (res) {
-        window.address = res.body.address;
-        window.utxos = res.body.utxos;
+    $.get("/api/accounts?pubkey=" + pk, function (res) {
+        window.address = res.address;
+        window.utxos = res.utxos;
         window.key = key;
-        $(".login-result").html = JSON.stringify(res.body);
+        $("#login-result").html(JSON.stringify(res));
 
         if (location.protocol != 'https:') {
-            var wsUri = "ws://http://172.17.0.2:8080/websocket/" + window.address;
+            var wsUri = "ws://" + window.location.host + "/websocket/" + window.address;
         } else {
-            var wsUri = "wss://http://172.17.0.2:8080/websocket/" + window.address;
+            var wsUri = "wss://" + window.location.host + "/websocket/" + window.address;
         }
 
         function connect() {
@@ -260,5 +260,7 @@ function login() {
                 }
             }
         }
+    }).error(function (data) {
+        $("#login-result").html(JSON.stringify(data));
     });
 }
