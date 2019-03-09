@@ -686,7 +686,7 @@ func main() {
 		if err := GameKernel.AddTransaction(tx, []common.Signature{sig}); err != nil {
 			return err
 		}
-		return c.NoContent(http.StatusOK)
+		return c.JSON(http.StatusOK, nil);
 	})
 
 	go ew.Run()
