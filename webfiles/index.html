@@ -398,16 +398,15 @@
 			var utxo = window.utxos[0];
 			window.utxos.splice(0, 1);
 			
-			function HEXToVBColor(rrggbb) {
-    			var bbggrr = rrggbb.substr(4, 2) + rrggbb.substr(2, 2) + rrggbb.substr(0, 2);
- 			   return parseInt(bbggrr, 16);
+			function HEXToUInt(rrggbb) {
+ 			   return parseInt(rrggbb, 16);
 			}
 
 			this.$http.post("/api/games/"  + window.address + "/commands/paint", {
 				utxo: utxo,
 				x: this.x,
 				y: this.y,
-				color: HEXToVBColor(this.color.substring(1)),
+				color: HEXToUInt(this.color.substring(1)),
 				amount: this.amount
 			}).then(function(res) {
 				this.result1 = JSON.stringify(res.body);
