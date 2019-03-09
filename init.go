@@ -105,7 +105,12 @@ func addSingleAccount(loader data.Loader, ctd *data.ContextData, KeyHash common.
 	acc.KeyHash = KeyHash
 	ctd.CreatedAccountMap[acc.Address_] = acc
 
-	gd := NewGameData()
+	gd := NewGameDataWithBoard(PictureBoard{
+		Width: 64,
+		Height: 64,
+		Cells: []PictureCell{},
+	})
+
 	var buffer bytes.Buffer
 	if _, err := gd.WriteTo(&buffer); err != nil {
 		panic(err)

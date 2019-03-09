@@ -493,6 +493,7 @@ func main() {
 		res := &WebGameRes{
 			Height: int(Height),
 			Count:  int(gd.Count),
+			PictureBoard: gd.Board,
 		}
 
 		//////////////////////////////////////////////////////////////////////

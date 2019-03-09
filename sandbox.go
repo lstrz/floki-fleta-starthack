@@ -4,7 +4,9 @@ import (
 	"errors"
 	"io"
 	"log"
+	"bytes"
 
+	"encoding/gob"
 	"github.com/fletaio/common/util"
 	"github.com/fletaio/core/amount"
 	"github.com/fletaio/core/data"
@@ -41,6 +43,7 @@ type WebNotify struct {
 type WebGameRes struct {
 	Height int `json:"height"` // DO NOT CHANGE
 	Count  int `json:"count"`
+	PictureBoard PictureBoard `json:"board"`
 }
 
 // transaction_type transaction types
@@ -68,14 +71,50 @@ func initSandboxComponent(act *data.Accounter, tran *data.Transactor) error {
 // GameData stores all data of the game
 type GameData struct {
 	Count uint64
+	Board PictureBoard
+}
+
+type PictureCell struct {
+	Color uint64
+	Price uint64
+	CreationTime uint64
+}
+
+type PictureBoard struct {
+	Width uint64
+	Height uint64
+	Cells []PictureCell
+}
+
+var EmptyBoard = &PictureBoard{
+	Width: 0,
+	Height: 0,
+	Cells: []PictureCell{},
 }
 
 // NewGameData returns a GameData
 func NewGameData() *GameData {
+	return NewGameDataWithBoard(*EmptyBoard)
+}
+
+func NewGameDataWithBoard(board PictureBoard) *GameData {
 	gd := &GameData{
 		Count: 0,
+		Board: board,
 	}
 	return gd
+}
+
+func (pb *PictureBoard) WriteTo(w io.Writer) (int64) {
+	var board bytes.Buffer
+	encoder := gob.NewEncoder(&board)
+
+	encoder.Encode(*pb)
+	n, err := util.WriteBytes(w, board.Bytes())
+	if err != nil {
+		panic(err)
+	}
+	return n
 }
 
 // WriteTo is a serialization function
@@ -86,6 +125,9 @@ func (gd *GameData) WriteTo(w io.Writer) (int64, error) {
 	} else {
 		wrote += n
 	}
+
+	wrote += gd.Board.WriteTo(w)
+
 	return wrote, nil
 }
 
@@ -98,6 +140,21 @@ func (gd *GameData) ReadFrom(r io.Reader) (int64, error) {
 		read += n
 		gd.Count = v
 	}
+
+	if bs, n, err := util.ReadBytes(r); err != nil {
+		panic(err)
+		return read, err
+	} else {
+		var buffer PictureBoard
+		decoder := gob.NewDecoder(bytes.NewReader(bs))
+		err := decoder.Decode(&buffer)
+		if err != nil {
+			panic(err)
+		}
+		gd.Board = buffer
+		read += n
+	}
+
 	return read, nil
 }
 
