@@ -71,6 +71,8 @@ func initChainComponent(act *data.Accounter, tran *data.Transactor) error {
 	return nil
 }
 
+var globalAccountAddress = common.MustParseAddress("3HPiADDVt3")
+
 func initGenesisContextData(act *data.Accounter, tran *data.Transactor) (*data.ContextData, error) {
 	loader := data.NewEmptyLoader(act.ChainCoord(), act, tran)
 	ctd := data.NewContextData(loader, nil)
@@ -79,7 +81,7 @@ func initGenesisContextData(act *data.Accounter, tran *data.Transactor) (*data.C
 	adminPubHash := common.MustParsePublicHash("3oawb1ubDv3tSJdhXDYiM53G58gJPTynVJwDWtbQYy2")
 	addUTXO(loader, ctd, adminPubHash, acg.Generate(), CreateAccountChannelSize)
 	addFormulator(loader, ctd, common.MustParsePublicHash("2NDLwtFxtrtUzy6Dga8mpzJDS5kapdWBKyptMhehNVB"), common.MustParseAddress("3CUsUpvEK"), "sandbox.fr00001")
-	addSingleAccount(loader, ctd, common.MustParsePublicHash("2222222222222222222222222222222222222222222"), common.MustParseAddress("3HPiADDVt3"), "gamestate")
+	addSingleAccount(loader, ctd, common.MustParsePublicHash("2222222222222222222222222222222222222222222"), globalAccountAddress, "gamestate")
 	RegisterAllowedPublicHash(adminPubHash)
 	return ctd, nil
 }
