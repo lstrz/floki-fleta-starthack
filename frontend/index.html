@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Flace</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="jquery-2.2.0.min.js"></script>
+    <script src="script.js"></script>
+    <script src="common.js"></script>
+    <script src="crypto.min.js"></script>
+    <script src="sha256.min.js"></script>
+</head>
+<body onload="initialize(); resizeCanvas();" onresize="resizeCanvas();">
+
+Color: <input type="color" id="color">
+Bid: <input type="number" id="price" min="1" value="1">
+Current price: <span id="current_price"></span>
+<br>
+<div id="div-canvas">
+    <canvas id="flace-canvas" class="flace-canvas"></canvas>
+</div>
+
+<div id="div-user">
+    <div id="div-register">
+        UserID: <input type="text" id="register-userid">
+        Password: <input type="password" id="register-password">
+        <button type="button" onclick="register();">Register</button>
+        <br>
+        Result:
+        <div id="register-result"></div>
+    </div>
+    <br>
+    <hr>
+    <br>
+    <div id="div-login">
+        UserID: <input type="text" id="login-userid">
+        Password: <input type="password" id="login-password">
+        <button type="button" onclick="login();">Login</button>
+        <br>
+        Result:
+        <div id="login-result"></div>
+    </div>
+</div>
+
+</body>
+</html>
