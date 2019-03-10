@@ -1,6 +1,6 @@
 var canvasW = 1024;
 var canvasH = 1024;
-var canvasPadding = 50;
+var canvasPadding = 30;
 var colors = new Array(canvasW * canvasH).fill(0);
 var prices = new Array(canvasW * canvasH).fill(0);
 var times = new Array(canvasW * canvasH).fill(0);
@@ -91,6 +91,12 @@ function sendRequest(canvas, event) {
     var rect = canvas.getBoundingClientRect();
     var x = Math.floor((event.clientX - rect.left) / window.scaleFactor);
     var y = Math.floor((event.clientY - rect.top) / window.scaleFactor);
+
+    var bid = parseInt(window.price.value);
+    if(bid <= prices[y * canvasW + x]) {
+        alert("Price of the selected pixel is higher than your offer");
+        return;
+    }
 
     $.post("/api/games/" + window.address + "/commands/paint", JSON.stringify({
         "utxo": utxo,
@@ -278,6 +284,7 @@ function login() {
                 }
             }
         }
+        $("body").toggleClass('state-login state-game');
     }).error(function (data) {
         $("#login-result").html(JSON.stringify(data));
     });

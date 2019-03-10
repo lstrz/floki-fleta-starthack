@@ -3,47 +3,71 @@
 <head>
     <meta charset="utf-8">
     <title>Flace</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="public/style.css">
     <script src="public/jquery-2.2.0.min.js"></script>
     <script src="public/script.js"></script>
     <script src="public/common.js"></script>
     <script src="public/crypto.min.js"></script>
     <script src="public/sha256.min.js"></script>
 </head>
-<body onload="initialize(); resizeCanvas();" onresize="resizeCanvas();">
+<body onload="initialize(); resizeCanvas();" onresize="resizeCanvas();" class="state-login">
 
-Color: <input type="color" id="color">
-Bid: <input type="number" id="price" min="1" value="1">
-Current price: <span id="current_price"></span>
-<br>
-Paint request result 1:
-<span id="paint-result1"></span>
-<br>
-Paint request result 2:
-<span id="paint-result2"></span>
 <div id="div-canvas">
     <canvas id="flace-canvas" class="flace-canvas"></canvas>
 </div>
 
-<div id="div-user">
-    <div id="div-register">
-        UserID: <input type="text" id="register-userid">
-        Password: <input type="password" id="register-password">
-        <button type="button" onclick="register();">Register</button>
-        <br>
-        Result:
-        <div id="register-result"></div>
+<div id="div-right-pane">
+    <div id="div-description-user">
+        <h2>
+            Welcome to Flace!
+        </h2>
+        <p>
+            If you don't have an account, register it and then login.
+            No identifiable information is stored and all data will be deleted after this event.
+        </p>
     </div>
-    <br>
-    <hr>
-    <br>
-    <div id="div-login">
-        UserID: <input type="text" id="login-userid">
-        Password: <input type="password" id="login-password">
-        <button type="button" onclick="login();">Login</button>
+
+    <div id="div-description-game">
+        <p>
+            Select a color, select how much you're willing to pay and then click on the pixel you would like to color.
+            If you're the highest bidder, the pixel will turn the color you picked.
+        </p>
+    </div>
+
+    <div id="div-game">
+        Color: <input type="color" id="color">
         <br>
-        Result:
-        <div id="login-result"></div>
+        Bid: <input type="number" id="price" min="1" value="1">
+        <br>
+        Current price: <span id="current_price"></span>
+        <br>
+        Paint request result 1:
+        <span id="paint-result1"></span>
+        <br>
+        Paint request result 2:
+        <span id="paint-result2"></span>
+    </div>
+
+    <div id="div-user">
+        <div id="div-register">
+            UserID: <input type="text" id="register-userid">
+            Password: <input type="password" id="register-password">
+            <button type="button" onclick="register();">Register</button>
+            <br>
+            Result:
+            <div id="register-result"></div>
+        </div>
+        <br>
+        <hr>
+        <br>
+        <div id="div-login">
+            UserID: <input type="text" id="login-userid">
+            Password: <input type="password" id="login-password">
+            <button type="button" onclick="login();">Login</button>
+            <br>
+            Result:
+            <div id="login-result"></div>
+        </div>
     </div>
 </div>
 

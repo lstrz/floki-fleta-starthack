@@ -2,15 +2,34 @@ html, body {
     margin: 0;
     height: 100vh;
     width: 100vw;
+    font-family: Sans;
 }
 
 #div-canvas {
     display: inline-block;
 }
 
-#div-user {
-    width: 200px;
+#div-right-pane {
     display: inline-block;
+    width: 200px;
+    padding: 0 2em;
+}
+
+#div-description-game, #div-description-user {
+    float: top;
+}
+
+/*#div-game, #div-user {*/
+/*display: inline-block;*/
+/*width: 200px;*/
+/*}*/
+
+.state-login #div-game, .state-login #div-description-game {
+    display: none;
+}
+
+.state-game #div-user, .state-game #div-description-user {
+    display: none;
 }
 
 canvas {
