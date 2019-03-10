@@ -38,22 +38,6 @@ function initializeCont() {
             setPixel(i, j, colors[off]);
         }
     }
-    // var ws = new WebSocket("ws://localhost:31337");
-    // window.ws = null;
-    // ws.onopen = function () {
-    //     window.ws = ws;
-    // };
-
-    // ws.onmessage = function (evt) {
-    //     var msg = JSON.parse(evt.data);
-    //     setPixel(msg.x, msg.y, msg.color);
-    // };
-
-    // ws.onclose = function() {
-    //
-    //     // websocket is closed.
-    //     alert("Connection is closed...");
-    // };
 
     canvas.addEventListener("mousedown", function (event) {
         sendRequest(canvas, event);
@@ -93,7 +77,7 @@ function sendRequest(canvas, event) {
     var y = Math.floor((event.clientY - rect.top) / window.scaleFactor);
 
     var bid = parseInt(window.price.value);
-    if(bid <= prices[y * canvasW + x]) {
+    if (bid <= prices[y * canvasW + x]) {
         alert("Price of the selected pixel is higher than your offer");
         return;
     }
@@ -281,9 +265,22 @@ function login() {
                         alert("Duplicated Connection");
                         location.reload();
                         break;
+                    case "paint":
+                        var off = noti.x + noti.y * canvasW;
+                        colors[off] = "#" + noti.color.toString(16).padStart(6, "0");
+                        prices[off] = noti.amount;
+                        //times[off] = noti.timestamp;
+                        setPixel(noti.x, noti.y, "#" + noti.color.toString(16).padStart(6, "0"));
+                        $("#contract-balance").html(noti.contract_balance);
+                        break;
+                    case "balance":
+                        $("#balance").html(noti.balance);
+                        break;
                 }
             }
         }
+
+        initialize();
         $("body").toggleClass('state-login state-game');
     }).error(function (data) {
         $("#login-result").html(JSON.stringify(data));
