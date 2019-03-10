@@ -56,6 +56,12 @@ type PaintNotify struct {
 	Amount uint64 `json:"amount"`
 }
 
+type BalanceNotify struct {
+	Type            string `json:"type"`
+	MyBalance       uint64 `json:"my_balance"`
+	ContractBalance uint64 `json:"contract_balance"`
+}
+
 type WebGameRes struct {
 	Height int `json:"height"` // DO NOT CHANGE
 	Count  int `json:"count"`

@@ -271,10 +271,10 @@ function login() {
                         prices[off] = noti.amount;
                         //times[off] = noti.timestamp;
                         setPixel(noti.x, noti.y, "#" + noti.color.toString(16).padStart(6, "0"));
-                        $("#contract-balance").html(noti.contract_balance);
                         break;
                     case "balance":
-                        $("#balance").html(noti.balance);
+                        $("#balance").html(noti.my_balance);
+                        $("#contract_balance").html(noti.contract_balance);
                         break;
                 }
             }

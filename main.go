@@ -771,6 +771,8 @@ func (ew *EventWatcher) processBlock(b *block.Block, ctx *data.Context) {
 		case *PaintTx:
 			notification := &PaintNotify{"paint", tx.X, tx.Y, tx.Color, tx.Payment}
 			ew.NotifyAll(notification)
+			// TODO fetch balances
+			ew.Notify(tx.Address, &BalanceNotify{"balance", 42, 142})
 		}
 	}
 }
@@ -834,7 +836,7 @@ func (ew *EventWatcher) DoTransactionBroadcast(kn *kernel.Kernel, msg *message_d
 func (ew *EventWatcher) DebugLog(kn *kernel.Kernel, args ...interface{}) {}
 
 // Notify TODO
-func (ew *EventWatcher) Notify(addr common.Address, noti *WebNotify) {
+func (ew *EventWatcher) Notify(addr common.Address, noti interface {}) {
 	ew.Lock()
 	defer ew.Unlock()
 
