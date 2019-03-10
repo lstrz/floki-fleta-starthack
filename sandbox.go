@@ -19,7 +19,7 @@ import (
 
 // consts
 const (
-	GameCommandChannelSize = 10
+	GameCommandChannelSize = 1000
 )
 
 // errors
