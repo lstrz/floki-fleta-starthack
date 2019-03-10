@@ -178,8 +178,12 @@
 							noti = e.data;
 						}
 
+						console.log(noti);
 						switch(noti.type) {
 						case "add_count": //AddCount
+							_this.push += "<br/>" + JSON.stringify(noti);
+							break;
+						case "paint": //AddCount
 							_this.push += "<br/>" + JSON.stringify(noti);
 							break;
 						case "__CONNECT__": //duplicated connection

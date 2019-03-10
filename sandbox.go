@@ -48,6 +48,14 @@ type WebNotify struct {
 	Error  string `json:"error"` // DO NOT CHANGE
 }
 
+type PaintNotify struct {
+	Type   string `json:"type"`
+	X	    uint64 `json:"x"`
+	Y	    uint64 `json:"y"`
+	Color  uint64 `json:"color"`
+	Amount uint64 `json:"amount"`
+}
+
 type WebGameRes struct {
 	Height int `json:"height"` // DO NOT CHANGE
 	Count  int `json:"count"`

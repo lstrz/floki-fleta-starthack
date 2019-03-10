@@ -768,6 +768,9 @@ func (ew *EventWatcher) processBlock(b *block.Block, ctx *data.Context) {
 			noti.Type = "add_count"
 			noti.Count = int(tx.Count)
 			ew.Notify(tx.Address, noti)
+		case *PaintTx:
+			notification := &PaintNotify{"paint", tx.X, tx.Y, tx.Color, tx.Payment}
+			ew.NotifyAll(notification)
 		}
 	}
 }
@@ -837,6 +840,15 @@ func (ew *EventWatcher) Notify(addr common.Address, noti *WebNotify) {
 
 	if conn, has := ew.writerMap[addr]; has {
 		conn.WriteJSON(noti)
+	}
+}
+
+func (ew *EventWatcher) NotifyAll(notification interface {}) {
+	ew.Lock()
+	defer ew.Unlock()
+
+	for _, connection := range ew.writerMap {
+		connection.WriteJSON(notification)
 	}
 }
 
