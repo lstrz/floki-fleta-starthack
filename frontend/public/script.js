@@ -27,6 +27,8 @@ function initialize() {
     });
 }
 
+var skipAddingListener = false;
+
 function initializeCont() {
     ctx.canvas.width = canvasW;
     ctx.canvas.height = canvasH;
@@ -39,12 +41,15 @@ function initializeCont() {
         }
     }
 
-    canvas.addEventListener("mousedown", function (event) {
-        sendRequest(canvas, event);
-    });
-    canvas.onmousemove = function (event) {
-        hoverPrice(canvas, event);
-    };
+    if (!skipAddingListener) {
+        canvas.addEventListener("mousedown", function (event) {
+            sendRequest(canvas, event);
+        });
+        canvas.onmousemove = function (event) {
+            hoverPrice(canvas, event);
+        };
+        skipAddingListener = true;
+    }
 
     var color = document.getElementById('color');
     var price = document.getElementById('price');
