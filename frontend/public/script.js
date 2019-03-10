@@ -279,7 +279,7 @@ function login() {
                         break;
                     case "balance":
                         $("#balance").html(noti.my_balance);
-                        $("#contract_balance").html(noti.contract_balance);
+                        $("#contract-balance").html(noti.contract_balance);
                         break;
                 }
             }
